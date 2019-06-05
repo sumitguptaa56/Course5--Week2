@@ -1,0 +1,86 @@
+---
+title: "Week2Assignment"
+author: "Sumit"
+date: "June 4, 2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## 1. Loading and preprocessing the data
+
+###  **Upload Data** in data MAtrix
+
+
+```{r}
+activity<-read.csv("./repdata_data_activity/activity.csv")
+```
+
+### **Process Data** : *Clean data with no NAs*
+
+```{r echo=TRUE}
+activity$date<-as.Date(as.character(activity$date))
+baseNA<-is.na(activity$steps)
+cleandata<-activity[!baseNA,]
+```
+
+
+## 2. What is mean total number of steps taken per day?
+
+
+###Calculate the total number of steps taken per day
+
+```{r echo=TRUE}
+StepsPerDay<-aggregate(cleandata$steps,by=list(cleandata$date),sum)
+names(StepsPerDay)[1]<-"Date"
+names(StepsPerDay)[2]<-"Steps"
+head(StepsPerDay)
+```
+
+### Make a histogram of the total number of steps taken each day
+
+```{r echo=TRUE}
+hist(StepsPerDay$Steps, xlab = "Total Steps", ylab =" No. of Days" , main="Histogram of Total Steps by day", breaks = 20)
+```
+
+###Calculate and report the mean and median of the total number of steps taken per day
+
+```{r echo=TRUE}
+mean(StepsPerDay$Steps)
+median(StepsPerDay$Steps)
+```
+
+## 3. What is the average daily activity pattern
+
+###Time Series Plot
+
+```{r echo=TRUE}
+library(ggplot2)
+StepsPerInterval<-aggregate(cleandata$steps,by=list(cleandata$interval),mean)
+names(StepsPerInterval)[1]<-"Interval"
+names(StepsPerInterval)[2]<-"Steps"
+qplot(Interval , Steps, data = StepsPerInterval, xlab ="Average steps ", ylab="interval",geom ="line")
+```
+
+
+### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps
+```{r echo=TRUE}
+StepsPerInterval[which(StepsPerInterval$Steps== max(StepsPerInterval$Steps)),]
+```
+
+##4. Imputing missing values
+
+### Calculate and report the total number of missing values in the dataset
+
+```{r echo=TRUE}
+sum(is.na(activity$steps))
+```
+
+###2.Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+
